@@ -1,43 +1,81 @@
-<script setup>
-import { ref } from 'vue'
+<script>
+import data from '../data.json'
 
-defineProps({
-  msg: String,
-})
-
-const count = ref(0)
+export default {
+  data () {
+    return {
+      data
+    }
+  },
+  computed: {
+    movies () {
+      return this.data.map(movie => {
+        return {
+          name: movie.name,
+          description: movie.description,
+          rating: movie.aggregateRating.ratingValue.toFixed(1),
+          year: movie.datePublished.split('-')[0],
+          duration: movie.duration,
+          id: movie.url
+        }
+      }).sort((a, b) => {
+        if (a.rating < b.rating) {
+          return 1;
+        }
+        if (a.rating > b.rating) {
+          return -1;
+        }
+        return 0;
+      })
+    }
+  },
+  methods: {
+    getColor (rating) {
+      if (rating >= 9) {
+        return 'green';
+      } else if (rating >= 8) {
+        return 'light-green-darken-1';
+      } else {
+        return null
+      }
+    }
+  }
+}
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
-
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
-  </div>
-
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
-  <p>
-    Learn more about IDE Support for Vue in the
-    <a
-      href="https://vuejs.org/guide/scaling-up/tooling.html#ide-support"
-      target="_blank"
-      >Vue Docs Scaling up Guide</a
-    >.
-  </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+  <flex-col style="gap: 20px"> 
+    <v-card 
+      v-for="(movie, i) in movies"
+      :text="movie.description"
+    >
+    <template v-slot:title>
+      <flex-row style="gap: 20px; justify-content: center;">
+        <h4 class="text-h5 font-weight-bold">{{i + 1}}. {{movie.name}}</h4>
+        <v-chip 
+          :color="getColor(movie.rating)"
+          variant="flat"
+          label
+        >
+        <span style="font-weight: bold">
+          {{ movie.rating }}
+        </span>
+        </v-chip>
+      </flex-row>
+    </template>
+    <template v-slot:subtitle>
+      <flex-row style="gap: 20px; justify-content: center;">
+        <div>
+          {{ movie.year }}
+        </div>
+        <div>
+          {{ movie.duration }}
+        </div>
+      </flex-row>
+    </template>
+      <!-- <flex-row v-for="v in Object.values(movie)">
+        {{ v }}
+      </flex-row> -->
+    </v-card>
+  </flex-col> 
 </template>
-
-<style scoped>
-.read-the-docs {
-  color: #888;
-}
-</style>
