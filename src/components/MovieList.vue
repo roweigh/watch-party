@@ -1,10 +1,12 @@
 <script>
 import data from '../data.json';
 
+import MovieItem from './movies/MovieItem.vue';
 import ExpansionPanelList from './ExpansionPanelList.vue';
 
 export default {
   components: {
+    MovieItem,
     ExpansionPanelList,
   },
   data () {
@@ -73,142 +75,24 @@ export default {
     },
   },
   methods: {
-    getColor (rating) {
-      if (rating >= 9) {
-        return 'green';
-      } else if (rating >= 8) {
-        return 'light-green-darken-1';
-      } else {
-        return null;
-      }
+    test(e) {
+      console.log(e);
     },
   },
 };
 </script>
 
 <template>
-  <flex-row>
+  <flex-row class="pa-5">
     <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
       <!-- <v-data-iterator></v-data-iterator> -->
-      <v-card
+      <movie-item
         v-for="movie in movies"
         :key="movie.id"
-      >
-        <v-card-title>
-          <flex-row style="gap: 20px; justify-content: center;">
-            <h4 class="text-h5 font-weight-bold">
-              {{ movie.name }}
-            </h4>
-          </flex-row>
-        </v-card-title>
-
-        <v-card-text class="bg-surface-light pt-4">
-          <flex-row>
-            <flex-col style="gap: 10px; flex-grow: 1">
-              <flex-row style="gap: 20px; justify-content: center; align-items: center;">
-                <div>
-                  {{ movie.year }}
-                </div>
-                <div>
-                  {{ movie.duration }}
-                </div>
-                <v-chip
-                  :color="getColor(movie.rating)"
-                  variant="flat"
-                  label
-                >
-                  <span style="font-weight: bold">
-                    {{ movie.rating }}
-                  </span>
-                </v-chip>
-              </flex-row>
-              <flex-row style="justify-content: center;">
-                {{ movie.description }}
-              </flex-row>
-            </flex-col>
-            <flex-col>
-              <v-badge
-                icon="mdi-heart"
-                color="pink"
-              >
-                <template #default>
-                  <v-avatar
-                    color="purple"
-                    icon="mdi-robot-angry"
-                  />
-                </template>
-              </v-badge>
-              <v-badge
-                icon="mdi-check"
-                color="green"
-              >
-                <template #default>
-                  <v-avatar
-                    color="purple"
-                    icon="mdi-robot-angry"
-                  />
-                </template>
-              </v-badge>
-              <v-badge
-                icon="mdi-close"
-                color="red"
-              >
-                <template #default>
-                  <v-avatar
-                    color="purple"
-                    icon="mdi-robot-angry"
-                  />
-                </template>
-              </v-badge>
-            </flex-col>
-          </flex-row>
-
-
-          <v-card-actions>
-            {{ movie.id }}
-            <v-spacer />
-            <v-tooltip
-              text="Keen"
-              location="top"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  icon="mdi-heart"
-                  variant="text"
-                  @click="interested.push(movie)"
-                />
-              </template>
-            </v-tooltip>
-            <v-tooltip
-              text="Mark Seen"
-              location="top"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  icon="mdi-eye"
-                  variant="text"
-                />
-              </template>
-            </v-tooltip>
-            <v-tooltip
-              text="Not Interested"
-              location="top"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  icon="mdi-delete"
-                  variant="text"
-                  @click="notInterested.push(movie)"
-                />
-              </template>
-            </v-tooltip>
-            <v-spacer />
-          </v-card-actions>
-        </v-card-text>
-      </v-card>
+        v-model:interested="interested"
+        v-model:not-interested="notInterested"
+        :movie="movie"
+      />
     </flex-col>
 
     <flex-col style="flex-grow: 1">
