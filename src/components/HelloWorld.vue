@@ -45,34 +45,75 @@ export default {
 
 <template>
   <flex-col style="gap: 20px"> 
-    <v-card 
-      v-for="(movie, i) in movies"
-      :text="movie.description"
-    >
-    <template v-slot:title>
-      <flex-row style="gap: 20px; justify-content: center;">
-        <h4 class="text-h5 font-weight-bold">{{i + 1}}. {{movie.name}}</h4>
-        <v-chip 
-          :color="getColor(movie.rating)"
-          variant="flat"
-          label
+    <v-card  v-for="(movie, i) in movies" >
+      <template v-slot:title>
+        <flex-row style="gap: 20px; justify-content: center;">
+          <h4 class="text-h5 font-weight-bold">{{i + 1}}. {{movie.name}}</h4>
+        </flex-row>
+      </template>
+
+      <template v-slot:text>
+        <flex-col style="gap: 10px">
+          <flex-row style="gap: 20px; justify-content: center; align-items: center;">
+            <div>
+              {{ movie.year }}
+            </div>
+            <div>
+              {{ movie.duration }}
+            </div>
+            <v-chip 
+              :color="getColor(movie.rating)"
+              variant="flat"
+              label
+            >
+            <span style="font-weight: bold">
+              {{ movie.rating }}
+            </span>
+            </v-chip>
+          </flex-row>
+          <flex-row style="justify-content: center;">
+            {{ movie.description }}
+          </flex-row>
+        </flex-col>
+      </template>
+    
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-tooltip 
+          text="Keen"
+          location="top"
         >
-        <span style="font-weight: bold">
-          {{ movie.rating }}
-        </span>
-        </v-chip>
-      </flex-row>
-    </template>
-    <template v-slot:subtitle>
-      <flex-row style="gap: 20px; justify-content: center;">
-        <div>
-          {{ movie.year }}
-        </div>
-        <div>
-          {{ movie.duration }}
-        </div>
-      </flex-row>
-    </template>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props"
+              icon="mdi-heart"
+              variant="text"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+        <v-tooltip 
+          text="Seen"
+          location="top"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props"
+              icon="mdi-check"
+              variant="text"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+        <v-tooltip 
+          text="Not Interested"
+          location="top"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props"
+              icon="mdi-close"
+              variant="text"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+        <v-spacer></v-spacer>
+      </v-card-actions>
       <!-- <flex-row v-for="v in Object.values(movie)">
         {{ v }}
       </flex-row> -->
