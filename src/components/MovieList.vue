@@ -10,11 +10,32 @@ export default {
   data () {
     return {
       data,
-      interested: [],
-      notInterested: [],
       expanded: [
         'interested',
         'notInterested',
+      ],
+
+      interested: [],
+      notInterested: [],
+
+      user: [
+        {
+          name: 'Roweigh',
+          color: 'teal',
+          avatar: 'mdi-emoticon-wink-outline',
+          seen: [],
+        },
+      ],
+      users:[
+        {
+          name: 'John Doe',
+          color: 'purple',
+          avatar: 'mdi-robot-angry',
+          seen: [
+            '/title/tt0111161/',
+            '/title/tt0068646/',
+          ],
+        },
       ],
     };
   },
@@ -69,84 +90,123 @@ export default {
   <flex-row>
     <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
       <v-card
-        v-for="movie in movies"
+        v-for="(movie, i) in movies"
         :key="movie.id"
       >
-        <template #title>
+        <v-card-title>
           <flex-row style="gap: 20px; justify-content: center;">
             <h4 class="text-h5 font-weight-bold">
               {{ movie.name }}
             </h4>
           </flex-row>
-        </template>
+        </v-card-title>
 
-        <template #text>
-          <flex-col style="gap: 10px">
-            <flex-row style="gap: 20px; justify-content: center; align-items: center;">
-              <div>
-                {{ movie.year }}
-              </div>
-              <div>
-                {{ movie.duration }}
-              </div>
-              <v-chip
-                :color="getColor(movie.rating)"
-                variant="flat"
-                label
-              >
-                <span style="font-weight: bold">
-                  {{ movie.rating }}
-                </span>
-              </v-chip>
-            </flex-row>
-            <flex-row style="justify-content: center;">
-              {{ movie.description }}
-            </flex-row>
-          </flex-col>
-        </template>
-
-        <v-card-actions>
-          <v-spacer />
-          <v-tooltip
-            text="Keen"
-            location="top"
-          >
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
+        <v-card-text class="bg-surface-light pt-4">
+          <flex-row>
+            <flex-col style="gap: 10px; flex-grow: 1">
+              <flex-row style="gap: 20px; justify-content: center; align-items: center;">
+                <div>
+                  {{ movie.year }}
+                </div>
+                <div>
+                  {{ movie.duration }}
+                </div>
+                <v-chip
+                  :color="getColor(movie.rating)"
+                  variant="flat"
+                  label
+                >
+                  <span style="font-weight: bold">
+                    {{ movie.rating }}
+                  </span>
+                </v-chip>
+              </flex-row>
+              <flex-row style="justify-content: center;">
+                {{ movie.description }}
+              </flex-row>
+            </flex-col>
+            <flex-col>
+              <v-badge
                 icon="mdi-heart"
-                variant="text"
-                @click="interested.push(movie)"
-              />
-            </template>
-          </v-tooltip>
-          <v-tooltip
-            text="Mark Seen"
-            location="top"
-          >
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-eye"
-                variant="text"
-              />
-            </template>
-          </v-tooltip>
-          <v-tooltip
-            text="Not Interested"
-            location="top"
-          >
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-delete"
-                variant="text"
-                @click="notInterested.push(movie)"
-              />
-            </template>
-          </v-tooltip>
-          <v-spacer />
-        </v-card-actions>
+                color="pink"
+              >
+                <template #default>
+                  <v-avatar
+                    color="purple"
+                    icon="mdi-robot-angry"
+                  />
+                </template>
+              </v-badge>
+              <v-badge
+                icon="mdi-check"
+                color="green"
+              >
+                <template #default>
+                  <v-avatar
+                    color="purple"
+                    icon="mdi-robot-angry"
+                  />
+                </template>
+              </v-badge>
+              <v-badge
+                icon="mdi-close"
+                color="red"
+              >
+                <template #default>
+                  <v-avatar
+                    color="purple"
+                    icon="mdi-robot-angry"
+                  />
+                </template>
+              </v-badge>
+            </flex-col>
+          </flex-row>
+
+
+          <v-card-actions>
+            {{ movie.id }}
+            <v-spacer />
+            <v-tooltip
+              text="Keen"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  icon="mdi-heart"
+                  variant="text"
+                  @click="interested.push(movie)"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              text="Mark Seen"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  icon="mdi-eye"
+                  variant="text"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              text="Not Interested"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  icon="mdi-delete"
+                  variant="text"
+                  @click="notInterested.push(movie)"
+                />
+              </template>
+            </v-tooltip>
+            <v-spacer />
+          </v-card-actions>
+        </v-card-text>
       </v-card>
     </flex-col>
 

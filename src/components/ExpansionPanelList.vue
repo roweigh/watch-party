@@ -19,11 +19,8 @@ export default {
         {{ title }}
       </h3>
     </template>
-    <template
-      v-if="list.length"
-      #text
-    >
-      <v-list>
+    <template #text>
+      <v-list height="250">
         <v-list-item
           v-for="movie in list"
           :key="movie.id"

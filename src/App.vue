@@ -1,30 +1,22 @@
 <script setup>
-import MovieList from './components/MovieList.vue'
+import MovieList from './components/MovieList.vue';
 </script>
 
 <template>
-  <v-toolbar title="Application">
-    <!-- <v-btn icon>
-      <v-icon>mdi-magnify</v-icon>
-    </v-btn>
-    <v-btn icon>
-      <v-icon>mdi-dots-vertical</v-icon>
-    </v-btn> -->
-  </v-toolbar>
-  <MovieList msg="Vite + Vue" />
-</template>
+  <v-layout>
+    <v-app-bar
+      color="grey"
+      flat
+    >
+      <v-toolbar-title>
+        <h3>
+          Watch Party
+        </h3>
+      </v-toolbar-title>
+    </v-app-bar>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+    <v-main>
+      <MovieList />
+    </v-main>
+  </v-layout>
+</template>
