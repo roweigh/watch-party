@@ -89,8 +89,9 @@ export default {
 <template>
   <flex-row>
     <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
+      <!-- <v-data-iterator></v-data-iterator> -->
       <v-card
-        v-for="(movie, i) in movies"
+        v-for="movie in movies"
         :key="movie.id"
       >
         <v-card-title>
