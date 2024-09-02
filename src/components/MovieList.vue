@@ -1,33 +1,54 @@
 <script>
 import data from '../data.json';
 
+import ExpansionPanelList from './ExpansionPanelList.vue';
+
 export default {
+  components: {
+    ExpansionPanelList,
+  },
   data () {
     return {
       data,
+      interested: [],
       notInterested: [],
+      expanded: [
+        'interested',
+        'notInterested',
+      ],
     };
   },
   computed: {
+    excluded () {
+      const notInterestedIds = this.notInterested.map(i => {return i.id;});
+      const interestedIds = this.interested.map(i => {return i.id;});
+      return [
+        ...interestedIds,
+        ...notInterestedIds,
+      ];
+    },
     movies () {
-      return this.data.map(movie => {
-        return {
-          name: movie.name,
-          description: movie.description,
-          rating: movie.aggregateRating.ratingValue.toFixed(1),
-          year: movie.datePublished.split('-')[0],
-          duration: movie.duration,
-          id: movie.url,
-        };
-      }).sort((a, b) => {
-        if (a.rating < b.rating) {
+      return [...this.data].sort((a, b) => {
+        if (a.aggregateRating.ratingValue < b.aggregateRating.ratingValue) {
           return 1;
         }
-        if (a.rating > b.rating) {
+        if (a.aggregateRating.ratingValue > b.aggregateRating.ratingValue) {
           return -1;
         }
         return 0;
-      });
+      })
+        .map((movie, i) => {
+          return {
+            id: movie.url,
+            name: `${i + 1}. ${movie.name}`,
+            description: movie.description,
+            rating: movie.aggregateRating.ratingValue.toFixed(1),
+            year: movie.datePublished.split('-')[0],
+            duration: movie.duration,
+          };
+        })
+        .filter(movie => {return !this.excluded.includes(movie.id); })
+        .slice(0, 10);
     },
   },
   methods: {
@@ -46,15 +67,15 @@ export default {
 
 <template>
   <flex-row>
-    <flex-col style="gap: 20px; max-width: 70%">
+    <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
       <v-card
-        v-for="(movie, i) in movies"
-        :key="i"
+        v-for="movie in movies"
+        :key="movie.id"
       >
         <template #title>
           <flex-row style="gap: 20px; justify-content: center;">
             <h4 class="text-h5 font-weight-bold">
-              {{ i + 1 }}. {{ movie.name }}
+              {{ movie.name }}
             </h4>
           </flex-row>
         </template>
@@ -95,29 +116,18 @@ export default {
                 v-bind="props"
                 icon="mdi-heart"
                 variant="text"
+                @click="interested.push(movie)"
               />
             </template>
           </v-tooltip>
           <v-tooltip
-            text="Don't care"
+            text="Mark Seen"
             location="top"
           >
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
-                icon="mdi-thumb-up"
-                variant="text"
-              />
-            </template>
-          </v-tooltip>
-          <v-tooltip
-            text="Seen"
-            location="top"
-          >
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-check"
+                icon="mdi-eye"
                 variant="text"
               />
             </template>
@@ -129,7 +139,7 @@ export default {
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
-                icon="mdi-close"
+                icon="mdi-delete"
                 variant="text"
                 @click="notInterested.push(movie)"
               />
@@ -137,38 +147,34 @@ export default {
           </v-tooltip>
           <v-spacer />
         </v-card-actions>
-        {{ notInterested }}
-        <!-- <flex-row v-for="v in Object.values(movie)">
-          {{ v }}
-        </flex-row> -->
       </v-card>
     </flex-col>
 
     <flex-col style="flex-grow: 1">
-      <v-expansion-panels>
-        <v-expansion-panel static>
-          <template #title>
-            <h3>
-              🐐 List
-            </h3>
-          </template>
-          <template #text>
-            hi
-          </template>
-        </v-expansion-panel>
-      </v-expansion-panels>
-
-      <v-expansion-panels>
-        <v-expansion-panel static>
-          <template #title>
-            <h3>
-              💩 List
-            </h3>
-          </template>
-          <template #text>
-            hi
-          </template>
-        </v-expansion-panel>
+      <v-expansion-panels
+        v-model="expanded"
+        multiple
+      >
+        <expansion-panel-list
+          v-model:list="interested"
+          value="interested"
+          title="🐐 List"
+        />
+        <!-- <expansion-panel-list
+          v-model:list="[]"
+          value="interested"
+          title="🐐 List"
+        />
+        <expansion-panel-list
+          v-model:list="[]"
+          value="interested"
+          title="🐐 List"
+        /> -->
+        <expansion-panel-list
+          v-model:list="notInterested"
+          value="notInterested"
+          title="💩 List"
+        />
       </v-expansion-panels>
     </flex-col>
   </flex-row>
