@@ -1,5 +1,5 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import MovieList from './components/MovieList.vue'
 </script>
 
 <template>
@@ -11,7 +11,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <v-icon>mdi-dots-vertical</v-icon>
     </v-btn> -->
   </v-toolbar>
-  <HelloWorld msg="Vite + Vue" />
+  <MovieList msg="Vite + Vue" />
 </template>
 
 <style scoped>
