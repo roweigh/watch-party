@@ -32,13 +32,13 @@ export default {
           Watch Party
         </h3>
       </v-toolbar-title>
-      <v-btn
+      <!-- <v-btn
         :loading="loading"
         variant="outlined"
         @click="bulkImport()"
       >
         Bulk Import
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
 
     <v-main>
