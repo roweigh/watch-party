@@ -16,13 +16,13 @@ import FlexRow from './components/flex/FlexRow.vue';
 import App from './App.vue';
 
 const firebaseApp = initializeApp({
-  apiKey: 'AIzaSyDwYJzfBWT_yfve_upzeGGjMQaTOTD4E_4',
-  authDomain: 'watch-party-2e8e1.firebaseapp.com',
-  projectId: 'watch-party-2e8e1',
-  storageBucket: 'watch-party-2e8e1.appspot.com',
-  messagingSenderId: '937198903893',
-  appId: '1:937198903893:web:a037e1483a5bc7e5572adc',
-  measurementId: 'G-XNY44R5F7S',
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: 'watch-party-e433c.firebaseapp.com',
+  projectId: 'watch-party-e433c',
+  storageBucket: 'watch-party-e433c.appspot.com',
+  messagingSenderId: '643238465941',
+  appId: '1:643238465941:web:320cea4af717f271a9669c',
+  measurementId: 'G-2EF477QLT4',
 });
 const db = getFirestore(firebaseApp);
 
