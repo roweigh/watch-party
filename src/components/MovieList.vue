@@ -14,6 +14,12 @@ export default {
   },
   data () {
     return {
+      user: {
+        name: 'Roweigh',
+        color: 'teal',
+        avatar: 'mdi-emoticon-wink-outline',
+      },
+
       loadingFlags: {
         initializing: false,
         loading: false,
@@ -23,20 +29,7 @@ export default {
         'notInterested',
       ],
 
-      movies: [],
-
-
-
-
-      interested: [],
-      notInterested: [],
-      seen: [],
-
-      user: {
-        name: 'Roweigh',
-        color: 'teal',
-        avatar: 'mdi-emoticon-wink-outline',
-      },
+      moviesData: [],
       users:[
         {
           name: 'John Doe',
@@ -51,23 +44,50 @@ export default {
     };
   },
   computed: {
-    excluded () {
-      // const notInterestedIds = this.notInterested.map(i => {return i.id;});
-      // const interestedIds = this.interested.map(i => {return i.id;});
-      return [
-        // ...interestedIds,
-        // ...notInterestedIds,
-      ];
+    movies () {
+      return this.moviesData.map((item, i) => {
+        const movie = item.data();
+        movie.name = `${i+1}. ${movie.name}`;
+        return {
+          id: item.id,
+          data: movie,
+          show: !(movie.notInterested.length === 1 && movie.notInterested[0] === this.user.name),
+        };
+      });
+    },
+
+    interested () {
+      return this.movies
+        .filter(movie =>  movie.data.interested.includes(this.user.name))
+        .map(movie => {
+          return {
+            id: movie.id,
+            name: movie.data.name,
+            voteList: movie.data.interested,
+          };
+        });
+    },
+
+    notInterested () {
+      return this.movies
+        .filter(movie => movie.data.notInterested.includes(this.user.name))
+        .map(movie => {
+          return {
+            id: movie.id,
+            name: movie.data.name,
+            voteList: movie.data.notInterested,
+          };
+        });
     },
   },
   async created() {
     await this.getMovies();
-    // this.loadingFlags.initializing
+    // this.loadingFlags.initializing = false
   },
   methods: {
     async getMovies ()  {
       await getMovies().then(response => {
-        this.movies = response;
+        this.moviesData = response;
       });
     },
 
@@ -86,25 +106,29 @@ export default {
   <flex-row class="pa-5">
     <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
       <!-- <v-data-iterator></v-data-iterator> -->
-      <movie-item
+      <template
         v-for="movie in movies"
         :key="movie.id"
-        :user="user"
-        :movie="movie.data()"
-        :loading="loadingFlags.loading"
-        @update-movie="updateMovie(movie.id, $event)"
-      />
+      >
+        <movie-item
+          :user="user"
+          :movie="movie.data"
+          :loading="loadingFlags.loading"
+          @update-movie="updateMovie(movie.id, $event)"
+        />
+      </template>
     </flex-col>
-
     <flex-col style="flex-grow: 1">
       <v-expansion-panels
         v-model="expanded"
         multiple
       >
         <expansion-panel-list
-          v-model:list="interested"
+          :user="user"
+          :list="interested"
           value="interested"
           title="🐐 List"
+          @update-movie="updateMovie($event.id, {interested: $event.result})"
         />
         <!-- <expansion-panel-list
           v-model:list="[]"
@@ -117,9 +141,11 @@ export default {
           title="🐐 List"
         /> -->
         <expansion-panel-list
-          v-model:list="notInterested"
+          :user="user"
+          :list="notInterested"
           value="notInterested"
           title="💩 List"
+          @update-movie="updateMovie($event.id, {notInterested: $event.result})"
         />
       </v-expansion-panels>
     </flex-col>

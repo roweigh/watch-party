@@ -1,11 +1,21 @@
 <script>
 export default {
   props: {
+    user: { type: Object, required: true },
     list: { type: Array, required: true },
     value: { type: String, default: '' },
     title: { type: String, default: '' },
   },
-  emits: ['update:list'],
+  emits: [
+    'update-movie',
+  ],
+  methods: {
+    removeSelf (movie) {
+      const result = [...movie.voteList];
+      result.splice(result.indexOf(this.userName));
+      this.$emit('update-movie', { id: movie.id, result });
+    },
+  },
 };
 </script>
 
@@ -30,7 +40,7 @@ export default {
             <v-btn
               icon="mdi-close"
               size="small"
-              @click="$emit('update:list', list.filter(item => item.id !== movie.id))"
+              @click="removeSelf(movie)"
             />
           </template>
         </v-list-item>

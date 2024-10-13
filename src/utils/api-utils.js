@@ -1,4 +1,5 @@
 import data from '../data.json';
+import { db } from '../main';
 import {
   doc,
   collection,
@@ -9,7 +10,6 @@ import {
   addDoc ,
   updateDoc,
 } from 'firebase/firestore';
-import { db } from '../main';
 
 export async function get (col) {
   const response = await getDocs(query(
@@ -18,12 +18,7 @@ export async function get (col) {
     limit(10),
   ));
 
-  const result = [];
-  response.forEach(doc => {
-    result.push(doc);
-  });
-
-  return result;
+  return response.docs;
 }
 
 export async function add (col, payload) {
