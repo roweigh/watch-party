@@ -19,6 +19,7 @@ export default {
 
       interested: [],
       notInterested: [],
+      seen: [],
 
       user: [
         {
@@ -43,11 +44,11 @@ export default {
   },
   computed: {
     excluded () {
-      const notInterestedIds = this.notInterested.map(i => {return i.id;});
-      const interestedIds = this.interested.map(i => {return i.id;});
+      // const notInterestedIds = this.notInterested.map(i => {return i.id;});
+      // const interestedIds = this.interested.map(i => {return i.id;});
       return [
-        ...interestedIds,
-        ...notInterestedIds,
+        // ...interestedIds,
+        // ...notInterestedIds,
       ];
     },
     movies () {
@@ -91,6 +92,7 @@ export default {
         :key="movie.id"
         v-model:interested="interested"
         v-model:not-interested="notInterested"
+        v-model:seen="seen"
         :movie="movie"
       />
     </flex-col>

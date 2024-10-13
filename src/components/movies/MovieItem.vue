@@ -9,11 +9,27 @@ export default {
     movie: { type: Object, required: true },
     interested: { type: Array, required: true },
     notInterested: { type: Array, required: true },
+    seen: { type: Array, required: true },
   },
   emits: [
     'update:interested',
     'update:not-interested',
+    'update:seen',
   ],
+  computed: {
+    liked () {
+      const liked = this.interested.map(m => m.id).includes(this.movie.id);
+      return liked ? 'pink-accent-2' : undefined;
+    },
+    unliked () {
+      const liked = this.notInterested.map(m => m.id).includes(this.movie.id);
+      return liked ? 'red' : undefined;
+    },
+    seened () {
+      const liked = this.seen.map(m => m.id).includes(this.movie.id);
+      return liked ? 'green' : undefined;
+    },
+  },
   methods: {
     getColor (rating) {
       if (rating >= 9) {
@@ -23,6 +39,62 @@ export default {
       } else {
         return null;
       }
+    },
+
+    updateInterested () {
+      if (this.liked) {
+        this.removeInterested();
+      } else {
+        this.addInterested();
+      }
+    },
+
+    addInterested () {
+      const result = [...this.interested, this.movie];
+      this.removeNotInterested();
+      this.$emit('update:interested', result);
+    },
+
+    removeInterested () {
+      const result = this.interested.filter(m => m.id !== this.movie.id);
+      this.$emit('update:interested', result);
+    },
+
+    updateNotInterested () {
+      if (this.unliked) {
+        this.removeNotInterested();
+      } else {
+        this.addNotInterested();
+      }
+    },
+
+    addNotInterested () {
+      const result = [...this.notInterested, this.movie];
+      this.removeInterested();
+      this.$emit('update:not-interested', result);
+    },
+
+    removeNotInterested () {
+      const result = this.notInterested.filter(m => m.id !== this.movie.id);
+      this.$emit('update:not-interested', result);
+    },
+
+    updateSeen () {
+      if (this.seened) {
+        this.removeSeen();
+      } else {
+        this.addSeen();
+      }
+    },
+
+    addSeen () {
+      const result = [...this.seen, this.movie];
+      this.$emit('update:seen', result);
+    },
+
+    removeSeen () {
+      const result = this.seen.filter(m => m.id !== this.movie.id);
+      this.$emit('update:seen', result);
     },
   },
 };
@@ -55,16 +127,19 @@ export default {
 
         <flex-row style="position: absolute; right: 20px; gap: 12px">
           <avatar
+            v-if="liked"
             icon="mdi-robot-angry"
             color="cyan-accent-4"
             type="like"
           />
           <avatar
+            v-if="seened"
             icon="mdi-robot-angry"
             color="cyan-accent-4"
             type="seen"
           />
           <avatar
+            v-if="unliked"
             icon="mdi-robot-angry"
             color="cyan-accent-4"
             type="unlike"
@@ -87,9 +162,10 @@ export default {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
+              :color="liked"
               icon="mdi-heart"
               variant="text"
-              @click="$emit('update:interested', [...interested, movie])"
+              @click="updateInterested()"
             />
           </template>
         </v-tooltip>
@@ -100,8 +176,10 @@ export default {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
+              :color="seened"
               icon="mdi-eye-check"
               variant="text"
+              @click="updateSeen()"
             />
           </template>
         </v-tooltip>
@@ -112,9 +190,10 @@ export default {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
+              :color="unliked"
               icon="mdi-close-thick"
               variant="text"
-              @click="$emit('update:not-interested', [...notInterested, movie])"
+              @click="updateNotInterested()"
             />
           </template>
         </v-tooltip>
