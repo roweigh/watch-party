@@ -1,6 +1,11 @@
 <script>
 import data from '../data.json';
 
+import {
+  getMovies,
+  updateMovie,
+} from '../api/movies';
+
 import MovieItem from './movies/MovieItem.vue';
 import ExpansionPanelList from './ExpansionPanelList.vue';
 
@@ -75,15 +80,31 @@ export default {
         .slice(0, 10);
     },
   },
+  async created() {
+    await getMovies();
+  },
   methods: {
-    test(e) {
-      console.log(e);
+    async updateMovie () {
+      await updateMovie('CWEj45l8cNSr0fEQuczO', {
+        description: 'yeet',
+        duration: '1',
+        id: '1',
+        interested: [],
+        name: 'name',
+        rating: '1',
+        ranking: Math.random(1),
+        seen: [],
+        year: 2000,
+      });
     },
   },
 };
 </script>
 
 <template>
+  <v-btn @click="updateMovie()">
+    hi
+  </v-btn>
   <flex-row class="pa-5">
     <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
       <!-- <v-data-iterator></v-data-iterator> -->
