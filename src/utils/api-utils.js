@@ -20,8 +20,9 @@ export async function get (col) {
 
   const result = [];
   response.forEach(doc => {
-    result.push(doc.data());
+    result.push(doc);
   });
+
   return result;
 }
 

@@ -14,6 +14,10 @@ export default {
   },
   data () {
     return {
+      loadingFlags: {
+        initializing: false,
+        loading: false,
+      },
       expanded: [
         'interested',
         'notInterested',
@@ -28,14 +32,11 @@ export default {
       notInterested: [],
       seen: [],
 
-      user: [
-        {
-          name: 'Roweigh',
-          color: 'teal',
-          avatar: 'mdi-emoticon-wink-outline',
-          seen: [],
-        },
-      ],
+      user: {
+        name: 'Roweigh',
+        color: 'teal',
+        avatar: 'mdi-emoticon-wink-outline',
+      },
       users:[
         {
           name: 'John Doe',
@@ -60,22 +61,21 @@ export default {
     },
   },
   async created() {
-    await getMovies().then(response => {
-      this.movies = response;
-    });
+    await this.getMovies();
+    // this.loadingFlags.initializing
   },
   methods: {
-    async updateMovie () {
-      await updateMovie('CWEj45l8cNSr0fEQuczO', {
-        description: 'yeet',
-        duration: '1',
-        id: '1',
-        interested: [],
-        name: 'name',
-        rating: '1',
-        ranking: Math.random(1),
-        seen: [],
-        year: 2000,
+    async getMovies ()  {
+      await getMovies().then(response => {
+        this.movies = response;
+      });
+    },
+
+    async updateMovie (id, payload) {
+      this.loadingFlags.loading = true;
+      await updateMovie(id, payload).then(async () => {
+        await this.getMovies();
+        this.loadingFlags.loading = false;
       });
     },
   },
@@ -89,10 +89,10 @@ export default {
       <movie-item
         v-for="movie in movies"
         :key="movie.id"
-        v-model:interested="interested"
-        v-model:not-interested="notInterested"
-        v-model:seen="seen"
-        :movie="movie"
+        :user="user"
+        :movie="movie.data()"
+        :loading="loadingFlags.loading"
+        @update-movie="updateMovie(movie.id, $event)"
       />
     </flex-col>
 

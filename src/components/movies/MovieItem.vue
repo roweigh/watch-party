@@ -6,28 +6,37 @@ export default {
     Avatar,
   },
   props: {
+    user: { type: Object, required: true },
     movie: { type: Object, required: true },
-    interested: { type: Array, required: true },
-    notInterested: { type: Array, required: true },
-    seen: { type: Array, required: true },
+    loading: { type: Boolean, required: true },
   },
   emits: [
-    'update:interested',
-    'update:not-interested',
-    'update:seen',
+    'update-movie',
   ],
   computed: {
+    userName () {
+      return this.user.name;
+    },
+    ratingColor () {
+      if (this.movie.rating >= 9) {
+        return 'green';
+      } else if (this.movie.rating >= 8) {
+        return 'light-green-darken-1';
+      } else {
+        return null;
+      }
+    },
     liked () {
-      const liked = this.interested.map(m => m.id).includes(this.movie.id);
+      const liked = this.movie.interested.includes(this.user.name);
       return liked ? 'pink-accent-2' : undefined;
     },
     unliked () {
-      const liked = this.notInterested.map(m => m.id).includes(this.movie.id);
-      return liked ? 'red' : undefined;
+      const unliked = this.movie.notInterested.includes(this.user.name);
+      return unliked ? 'red' : undefined;
     },
-    seened () {
-      const liked = this.seen.map(m => m.id).includes(this.movie.id);
-      return liked ? 'green' : undefined;
+    seen () {
+      const seen = this.movie.seen.map(m => m.id).includes(this.movie.id);
+      return seen ? 'green' : undefined;
     },
   },
   methods: {
@@ -43,58 +52,67 @@ export default {
 
     updateInterested () {
       if (this.liked) {
-        this.removeInterested();
+        this.$emit('update-movie', {
+          interested: this.movie.interested.filter(name => name !== this.userName),
+        });
       } else {
-        this.addInterested();
+        const payload = {
+          interested: [
+            ...this.movie.interested,
+            this.userName,
+          ],
+        };
+
+        if (this.unliked) {
+          const notInterested = [...this.movie.notInterested];
+          const i = notInterested.indexOf(this.userName);
+          notInterested.splice(i);
+          payload.notInterested = notInterested;
+        }
+
+        this.$emit('update-movie', payload);
       }
     },
 
-    addInterested () {
-      const result = [...this.interested, this.movie];
-      this.removeNotInterested();
-      this.$emit('update:interested', result);
-    },
-
-    removeInterested () {
-      const result = this.interested.filter(m => m.id !== this.movie.id);
-      this.$emit('update:interested', result);
-    },
-
-    updateNotInterested () {
+    notInterested () {
       if (this.unliked) {
-        this.removeNotInterested();
+        this.$emit('update-movie', {
+          notInterested: this.movie.notInterested.filter(name => name !== this.userName),
+        });
       } else {
-        this.addNotInterested();
+        const payload = {
+          notInterested: [
+            ...this.movie.notInterested,
+            this.userName,
+          ],
+        };
+
+        if (this.liked) {
+          const interested = [...this.movie.interested];
+          const i = interested.indexOf(this.userName);
+          interested.splice(i);
+          payload.interested = interested;
+        }
+
+        this.$emit('update-movie', payload);
       }
-    },
-
-    addNotInterested () {
-      const result = [...this.notInterested, this.movie];
-      this.removeInterested();
-      this.$emit('update:not-interested', result);
-    },
-
-    removeNotInterested () {
-      const result = this.notInterested.filter(m => m.id !== this.movie.id);
-      this.$emit('update:not-interested', result);
     },
 
     updateSeen () {
-      if (this.seened) {
-        this.removeSeen();
+      if (this.seen) {
+        const payload = {
+          seen: this.movie.seen.filter(name => name !== this.userName),
+        };
+        this.$emit('update-movie', payload);
       } else {
-        this.addSeen();
+        const payload = {
+          seen: [
+            ...this.movie.seen,
+            this.userName,
+          ],
+        };
+        this.$emit('update-movie', payload);
       }
-    },
-
-    addSeen () {
-      const result = [...this.seen, this.movie];
-      this.$emit('update:seen', result);
-    },
-
-    removeSeen () {
-      const result = this.seen.filter(m => m.id !== this.movie.id);
-      this.$emit('update:seen', result);
     },
   },
 };
@@ -116,7 +134,7 @@ export default {
         <span> {{ movie.year }} </span>
         <span> {{ movie.duration }} </span>
         <v-chip
-          :color="getColor(movie.rating)"
+          :color="ratingColor"
           variant="flat"
           label
         >
@@ -133,7 +151,7 @@ export default {
             type="like"
           />
           <avatar
-            v-if="seened"
+            v-if="seen"
             icon="mdi-robot-angry"
             color="cyan-accent-4"
             type="seen"
@@ -162,6 +180,7 @@ export default {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
+              :loading="loading"
               :color="liked"
               icon="mdi-heart"
               variant="text"
@@ -176,7 +195,8 @@ export default {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              :color="seened"
+              :loading="loading"
+              :color="seen"
               icon="mdi-eye-check"
               variant="text"
               @click="updateSeen()"
@@ -190,10 +210,11 @@ export default {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
+              :loading="loading"
               :color="unliked"
               icon="mdi-close-thick"
               variant="text"
-              @click="updateNotInterested()"
+              @click="notInterested()"
             />
           </template>
         </v-tooltip>
