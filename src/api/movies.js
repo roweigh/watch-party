@@ -1,5 +1,5 @@
 
-import { get, update } from '../utils/api-utils';
+import { get, add, update } from '../utils/api-utils';
 
 export const getMovies = async () => get('movies');
 export const addMovie = async (payload) => add('movies', payload);

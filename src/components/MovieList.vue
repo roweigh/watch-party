@@ -1,6 +1,4 @@
 <script>
-import data from '../data.json';
-
 import {
   getMovies,
   updateMovie,
@@ -16,11 +14,15 @@ export default {
   },
   data () {
     return {
-      data,
       expanded: [
         'interested',
         'notInterested',
       ],
+
+      movies: [],
+
+
+
 
       interested: [],
       notInterested: [],
@@ -56,32 +58,11 @@ export default {
         // ...notInterestedIds,
       ];
     },
-    movies () {
-      return [...this.data].sort((a, b) => {
-        if (a.aggregateRating.ratingValue < b.aggregateRating.ratingValue) {
-          return 1;
-        }
-        if (a.aggregateRating.ratingValue > b.aggregateRating.ratingValue) {
-          return -1;
-        }
-        return 0;
-      })
-        .map((movie, i) => {
-          return {
-            id: movie.url,
-            name: `${i + 1}. ${movie.name}`,
-            description: movie.description,
-            rating: movie.aggregateRating.ratingValue.toFixed(1),
-            year: movie.datePublished.split('-')[0],
-            duration: movie.duration,
-          };
-        })
-        .filter(movie => {return !this.excluded.includes(movie.id); })
-        .slice(0, 10);
-    },
   },
   async created() {
-    await getMovies();
+    await getMovies().then(response => {
+      this.movies = response;
+    });
   },
   methods: {
     async updateMovie () {
@@ -102,9 +83,6 @@ export default {
 </script>
 
 <template>
-  <v-btn @click="updateMovie()">
-    hi
-  </v-btn>
   <flex-row class="pa-5">
     <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
       <!-- <v-data-iterator></v-data-iterator> -->
