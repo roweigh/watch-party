@@ -103,14 +103,20 @@ export default {
 </script>
 
 <template>
-  <flex-row class="pa-5">
-    <flex-col style="gap: 20px; max-width: 70%; min-width: 70%">
+  <flex-row
+    class="pa-5"
+    style="justify-content: end;"
+  >
+    <flex-col
+      style="gap: 20px; max-width: 50%; min-width: 50%; margin-left: 20px; margin-right: 20px"
+    >
       <!-- <v-data-iterator></v-data-iterator> -->
       <template
         v-for="movie in movies"
         :key="movie.id"
       >
         <movie-item
+          v-if="movie.show"
           :user="user"
           :movie="movie.data"
           :loading="loadingFlags.loading"
@@ -118,7 +124,7 @@ export default {
         />
       </template>
     </flex-col>
-    <flex-col style="flex-grow: 1">
+    <flex-col style="flex-grow: 1; max-width: 25%; min-width: 25%">
       <v-expansion-panels
         v-model="expanded"
         multiple
