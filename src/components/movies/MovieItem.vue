@@ -8,7 +8,7 @@ export default {
   props: {
     user: { type: Object, required: true },
     movie: { type: Object, required: true },
-    loading: { type: Boolean, required: true },
+    loading: { type: Boolean, default: false },
   },
   emits: [
     'update-movie',
@@ -33,7 +33,7 @@ export default {
       return unliked ? 'red' : undefined;
     },
     seen () {
-      const seen = this.movie.seen.map(m => m.id).includes(this.movie.id);
+      const seen = this.movie.seen.includes(this.userName);
       return seen ? 'green' : undefined;
     },
   },
@@ -47,71 +47,6 @@ export default {
         return null;
       }
     },
-
-    updateInterested () {
-      if (this.liked) {
-        this.$emit('update-movie', {
-          interested: this.movie.interested.filter(name => name !== this.userName),
-        });
-      } else {
-        const payload = {
-          interested: [
-            ...this.movie.interested,
-            this.userName,
-          ],
-        };
-
-        if (this.unliked) {
-          const notInterested = [...this.movie.notInterested];
-          const i = notInterested.indexOf(this.userName);
-          notInterested.splice(i);
-          payload.notInterested = notInterested;
-        }
-
-        this.$emit('update-movie', payload);
-      }
-    },
-
-    notInterested () {
-      if (this.unliked) {
-        this.$emit('update-movie', {
-          notInterested: this.movie.notInterested.filter(name => name !== this.userName),
-        });
-      } else {
-        const payload = {
-          notInterested: [
-            ...this.movie.notInterested,
-            this.userName,
-          ],
-        };
-
-        if (this.liked) {
-          const interested = [...this.movie.interested];
-          const i = interested.indexOf(this.userName);
-          interested.splice(i);
-          payload.interested = interested;
-        }
-
-        this.$emit('update-movie', payload);
-      }
-    },
-
-    updateSeen () {
-      if (this.seen) {
-        const payload = {
-          seen: this.movie.seen.filter(name => name !== this.userName),
-        };
-        this.$emit('update-movie', payload);
-      } else {
-        const payload = {
-          seen: [
-            ...this.movie.seen,
-            this.userName,
-          ],
-        };
-        this.$emit('update-movie', payload);
-      }
-    },
   },
 };
 </script>
@@ -119,13 +54,13 @@ export default {
 <template>
   <v-card>
     <v-card-title class="bg-grey-darken-3 text-h5 font-weight-bold">
-      {{ movie.name }}
+      {{ movie?.name }}
     </v-card-title>
 
     <v-card-text class="bg-grey-darken-2 pt-4">
       <flex-row style="gap: 20px; justify-content: center; align-items: center;">
-        <v-label> {{ movie.year }} </v-label>
-        <v-label> {{ movie.duration }} </v-label>
+        <v-label> {{ movie?.year }} </v-label>
+        <v-label> {{ movie?.duration }} </v-label>
         <v-chip
           :color="ratingColor"
           class="font-weight-bold"
@@ -133,7 +68,7 @@ export default {
           variant="flat"
           label
         >
-          {{ movie.rating }}
+          {{ movie?.rating }}
         </v-chip>
 
         <flex-row style="position: absolute; right: 20px; gap: 12px">
@@ -159,7 +94,7 @@ export default {
       </flex-row>
 
       <p class="py-3">
-        {{ movie.description }}
+        {{ movie?.description }}
       </p>
 
       <flex-row class="justify-center">
@@ -174,7 +109,7 @@ export default {
               :color="liked"
               icon="mdi-heart"
               variant="text"
-              @click="updateInterested()"
+              @click="$emit('interested', { liked, unliked })"
             />
           </template>
         </v-tooltip>
@@ -189,7 +124,7 @@ export default {
               :color="seen"
               icon="mdi-eye-check"
               variant="text"
-              @click="updateSeen()"
+              @click="$emit('seen', seen)"
             />
           </template>
         </v-tooltip>
@@ -204,7 +139,7 @@ export default {
               :color="unliked"
               icon="mdi-close-thick"
               variant="text"
-              @click="notInterested()"
+              @click="$emit('not-interested', { liked, unliked })"
             />
           </template>
         </v-tooltip>

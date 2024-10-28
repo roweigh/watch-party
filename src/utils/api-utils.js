@@ -12,13 +12,21 @@ import {
 } from 'firebase/firestore';
 
 export async function get (col) {
-  const response = await getDocs(query(
+  const result = [];
+  await getDocs(query(
     collection(db, col),
     orderBy('rating', 'desc'),
     limit(10),
-  ));
+  )).then(({ docs }) => {
+    docs.forEach(doc => {
+      result.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+  });
 
-  return response.docs;
+  return result;
 }
 
 export async function add (col, payload) {

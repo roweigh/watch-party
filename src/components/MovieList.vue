@@ -22,6 +22,7 @@ export default {
 
       loadingFlags: {
         initializing: false,
+        saving: false,
         loading: false,
       },
       expanded: [
@@ -44,38 +45,38 @@ export default {
     };
   },
   computed: {
-    movies () {
-      return this.moviesData.map((item, i) => {
-        const movie = item.data();
-        movie.name = `${i+1}. ${movie.name}`;
-        return {
-          id: item.id,
-          data: movie,
-          show: !(movie.notInterested.length === 1 && movie.notInterested[0] === this.user.name),
-        };
-      });
-    },
+    // movies () {
+    //   return this.moviesData.map((item, i) => {
+    //     const movie = item.data();
+    //     movie.name = `${i+1}. ${movie.name}`;
+    //     return {
+    //       id: item.id,
+    //       data: movie,
+    //       show: !(movie.notInterested.length === 1 && movie.notInterested[0] === this.user.name),
+    //     };
+    //   });
+    // },
 
     interested () {
-      return this.movies
-        .filter(movie =>  movie.data.interested.includes(this.user.name))
+      return this.moviesData
+        .filter(movie =>  movie.interested.includes(this.user.name))
         .map(movie => {
           return {
             id: movie.id,
-            name: movie.data.name,
-            voteList: movie.data.interested,
+            name: movie.name,
+            voteList: movie.interested,
           };
         });
     },
 
     notInterested () {
-      return this.movies
-        .filter(movie => movie.data.notInterested.includes(this.user.name))
+      return this.moviesData
+        .filter(movie => movie.notInterested.includes(this.user.name))
         .map(movie => {
           return {
             id: movie.id,
-            name: movie.data.name,
-            voteList: movie.data.notInterested,
+            name: movie.name,
+            voteList: movie.notInterested,
           };
         });
     },
@@ -93,34 +94,80 @@ export default {
 
     async updateMovie (id, payload) {
       this.loadingFlags.loading = true;
-      await updateMovie(id, payload).then(async () => {
-        await this.getMovies();
+      await updateMovie(id, payload).then(() => {
         this.loadingFlags.loading = false;
       });
+    },
+
+    async updateInterested (movie, { liked, unliked }) {
+      const payload = { interested: movie.interested };
+      this.loadingFlags.loading = true;
+      if (liked) {
+        movie.interested = movie.interested.filter(name => name !== this.user.name);
+      } else {
+        movie.interested.push(this.user.name);
+      }
+
+      if (unliked) {
+        movie.notInterested = movie.notInterested.filter(name => name !== this.user.name);
+        payload.notInterested = movie.notInterested;
+      }
+
+      await updateMovie(movie.id, payload);
+      this.loadingFlags.loading = false;
+    },
+
+    async updateNotInterested (movie, { liked, unliked }) {
+      const payload = { notInterested: movie.notInterested };
+      this.loadingFlags.loading = true;
+      if (unliked) {
+        movie.notInterested = movie.notInterested.filter(name => name !== this.user.name);
+      } else {
+        movie.notInterested.push(this.user.name);
+      }
+
+      if (liked) {
+        movie.interested = movie.interested.filter(name => name !== this.user.name);
+        payload.interested = movie.interested;
+      }
+
+      await updateMovie(movie.id, payload);
+      this.loadingFlags.loading = false;
+    },
+
+    async updateSeen (movie, seen) {
+      const payload = { seen: movie.seen };
+      this.loadingFlags.loading = true;
+      if (!seen) {
+        movie.seen.push(this.user.name);
+      } else {
+        movie.seen = movie.seen.filter(name => name !== this.user.name);
+      }
+
+      await updateMovie(movie.id, payload);
+      this.loadingFlags.loading = false;
     },
   },
 };
 </script>
 
 <template>
-  <flex-row
-    class="pa-5"
-    style="justify-content: end;"
-  >
-    <flex-col
-      style="gap: 20px; max-width: 50%; min-width: 50%; margin-left: 20px; margin-right: 20px"
-    >
+  <flex-row class="pa-5 justify-end">
+    <v-progress-circular
+      :indeterminate="loadingFlags.loading"
+    />
+    <flex-col style="gap: 20px; max-width: 50%; min-width: 50%; margin-left: 20px; margin-right: 20px">
       <!-- <v-data-iterator></v-data-iterator> -->
       <template
-        v-for="movie in movies"
+        v-for="movie in moviesData"
         :key="movie.id"
       >
         <movie-item
-          v-if="movie.show"
           :user="user"
-          :movie="movie.data"
-          :loading="loadingFlags.loading"
-          @update-movie="updateMovie(movie.id, $event)"
+          :movie="movie"
+          @interested="updateInterested(movie, $event)"
+          @not-interested="updateNotInterested(movie, $event)"
+          @seen="updateSeen(movie, $event)"
         />
       </template>
     </flex-col>
