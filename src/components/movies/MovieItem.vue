@@ -14,9 +14,7 @@ export default {
     'update-movie',
   ],
   computed: {
-    userName () {
-      return this.user.name;
-    },
+    userName () { return this.user.name; },
     ratingColor () {
       if (this.movie.rating >= 9) {
         return 'green';
@@ -27,11 +25,11 @@ export default {
       }
     },
     liked () {
-      const liked = this.movie.interested.includes(this.user.name);
+      const liked = this.movie.interested.includes(this.userName);
       return liked ? 'pink-accent-2' : undefined;
     },
     unliked () {
-      const unliked = this.movie.notInterested.includes(this.user.name);
+      const unliked = this.movie.notInterested.includes(this.userName);
       return unliked ? 'red' : undefined;
     },
     seen () {
@@ -120,27 +118,22 @@ export default {
 
 <template>
   <v-card>
-    <v-card-title class="bg-grey-darken-3">
-      <span class="text-h5 font-weight-bold">
-        {{ movie.name }}
-      </span>
+    <v-card-title class="bg-grey-darken-3 text-h5 font-weight-bold">
+      {{ movie.name }}
     </v-card-title>
 
     <v-card-text class="bg-grey-darken-2 pt-4">
-      <flex-row
-        class="text-medium-emphasis"
-        style="gap: 20px; justify-content: center; align-items: center;"
-      >
-        <span> {{ movie.year }} </span>
-        <span> {{ movie.duration }} </span>
+      <flex-row style="gap: 20px; justify-content: center; align-items: center;">
+        <v-label> {{ movie.year }} </v-label>
+        <v-label> {{ movie.duration }} </v-label>
         <v-chip
           :color="ratingColor"
+          class="font-weight-bold"
+          density="compact"
           variant="flat"
           label
         >
-          <span style="font-weight: bold">
-            {{ movie.rating }}
-          </span>
+          {{ movie.rating }}
         </v-chip>
 
         <flex-row style="position: absolute; right: 20px; gap: 12px">
@@ -165,14 +158,11 @@ export default {
         </flex-row>
       </flex-row>
 
-      <flex-row
-        class="pt-3 pb-3"
-        style="justify-content: center;"
-      >
+      <p class="py-3">
         {{ movie.description }}
-      </flex-row>
+      </p>
 
-      <flex-row style="justify-content: center;">
+      <flex-row class="justify-center">
         <v-tooltip
           text="Keen"
           location="top"
